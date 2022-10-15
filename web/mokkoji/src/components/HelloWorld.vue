@@ -8,7 +8,7 @@
         <button v-on:click="connectWallet">메타마스크 지갑 연결</button>
       </div>
       <div v-else>
-        <button>컨트랙트 연결</button>
+        <button v-on:click="connectToContract">컨트랙트 연결</button>
       </div>
     </div>
     <div v-else>
@@ -49,6 +49,10 @@ export default {
     {
       console.log("click : connect to contract");
       var contractAddress = "0x60aCf6de68fEd0c2608e9DC96077f51786c13dda";
+      var provider = new ethers.providers.Web3Provider(window.ethereum);
+      var signer = provider.getSigner();
+      var contract = new ethers.Contract(contractAddress, abi, signer);
+      console.log(contract);
     }
   }
 }
