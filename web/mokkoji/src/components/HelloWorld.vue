@@ -7,8 +7,30 @@
       <div v-if="myAddress == null">
         <button v-on:click="connectWallet">메타마스크 지갑 연결</button>
       </div>
+
       <div v-else>
-        <button v-on:click="connectToContract">컨트랙트 연결</button>
+        <!-- 지갑이 연결이 된 이후 -->
+        <div v-if="myContract == null">
+          <button v-on:click="connectToContract">컨트랙트 연결</button>
+        </div>
+        <div v-else>
+          <!-- 컨트랙트까지 연결된 이후  -->
+          <div> <!-- ownerOf 구현 -->
+            <input type="text" placeholder="tokenId" v-model="ownerOf_tokenId">
+            <button v-on:click="requestOwnerOf">ownerOf 요청</button>
+            <div>
+              <!-- 결과값 -->
+              {{ownerOf_result}}
+            </div>
+          </div>
+          <div><!-- balanceOf 구현 -->
+            <input type="text" placeholder="address" v-model="balnceOf_address">
+            <button v-on:click="requestBalanceOf">balanceOf 요청</button>
+            <div>
+              {{balanceOf_result}}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -31,6 +53,12 @@ export default {
       // 이 변수에는 뒤의 조건이 모두 true일 때 true가 저장된다.
       isInstallMetaMask : window.ethereum.isMetaMask != null && window.ethereum.isMetaMask == true,
       myAddress : null,
+      myContract : null,
+      // input field에 넣은 값이 이 변수에 저장
+      ownerOf_tokenId : null,
+      ownerOf_result : null,
+      balnceOf_address : null,
+      balanceOf_result : null,
     }
   },
   methods:{
@@ -49,10 +77,25 @@ export default {
     {
       console.log("click : connect to contract");
       var contractAddress = "0x60aCf6de68fEd0c2608e9DC96077f51786c13dda";
+      // 객체들을 동적 할당할 때 new를 사용한다.
       var provider = new ethers.providers.Web3Provider(window.ethereum);
       var signer = provider.getSigner();
-      var contract = new ethers.Contract(contractAddress, abi, signer);
-      console.log(contract);
+      this.myContract = new ethers.Contract(contractAddress, abi, signer);
+      console.log(this.myContract);
+    },
+    async requestOwnerOf()
+    {
+      console.log("click requestOwnerOf");
+      console.log(this.ownerOf_tokenId);
+      this.ownerOf_result = await this.myContract.ownerOf(this.ownerOf_tokenId)
+      console.log(this.ownerOf_result);
+    },
+    async requestBalanceOf()
+    {
+      console.log("click requestBalanceOf");
+      console.log(this.balnceOf_address);
+      this.balanceOf_result = await this.myContract.balanceOf(this.balnceOf_address)
+      console.log(this.balanceOf_result);
     }
   }
 }
