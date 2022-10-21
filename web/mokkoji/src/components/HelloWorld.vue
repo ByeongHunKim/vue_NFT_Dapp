@@ -30,6 +30,15 @@
               {{balanceOf_result}}
             </div>
           </div>
+          <div><!-- mint 구현 -->
+            <input type="text" placeholder="address" v-model="mint_toAddr">
+            <input type="text" placeholder="tokenId" v-model="mint_tokenId">
+            <input type="text" placeholder="uri" v-model="mint_uri">
+            <button v-on:click="requestMint">mint 요청</button>
+            <div>
+              {{mint_result}}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -59,6 +68,10 @@ export default {
       ownerOf_result : null,
       balnceOf_address : null,
       balanceOf_result : null,
+      mint_toAddr : null,
+      mint_tokenId : null,
+      mint_uri : null,
+      mint_result : null
     }
   },
   methods:{
@@ -96,6 +109,27 @@ export default {
       console.log(this.balnceOf_address);
       this.balanceOf_result = await this.myContract.balanceOf(this.balnceOf_address)
       console.log(this.balanceOf_result);
+    },
+    async requestMint()
+    {
+      console.log("click requestMint");
+      console.log("this.mint_toAddr", this.mint_toAddr);
+      console.log("this.mint_tokenId", this.mint_tokenId);
+      console.log("this.mint_uri", this.mint_uri);
+      try{
+        this.mint_result = await this.myContract.mint(this.mint_toAddr, this.mint_tokenId, this.mint_uri)
+        if(this.mint_result['hash']){
+          alert("minting finished!")
+          this.mint_result = this.mint_result['hash']
+        }
+        else{
+          this.mint_result = "transaction failed"
+        }
+      }
+      catch{
+        alert("minting failed")
+        this.mint_result = "transaction failed"
+      }
     }
   }
 }
