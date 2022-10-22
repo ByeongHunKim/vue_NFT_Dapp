@@ -3,7 +3,9 @@
     <!-- vue에서 if문 사용 : 메타마스크가 설치되었으면 아래 문구 렌더링, 미설치 시 v-else 가 적용되어있는 div태그 렌더링 -->
     <!-- v-if, else는 꼭 붙어있어야 한다. -->
     <div v-if="isInstallMetaMask">
-      <div>메타마스크 설치됨</div>
+      <div class="fontColor fontLargeSize">
+        메타마스크 설치됨
+      </div>
       <div v-if="myAddress == null">
         <button v-on:click="connectWallet">메타마스크 지갑 연결</button>
       </div>
@@ -31,7 +33,7 @@
             </div>
           </div>
           <div><!-- mint 구현 -->
-            <input type="text" placeholder="address" v-model="mint_toAddr">
+            <!-- <input type="text" placeholder="address" v-model="mint_toAddr"> -->
             <input type="text" placeholder="tokenId" v-model="mint_tokenId">
             <input type="text" placeholder="uri" v-model="mint_uri">
             <button v-on:click="requestMint">mint 요청</button>
@@ -71,7 +73,8 @@ export default {
       mint_toAddr : null,
       mint_tokenId : null,
       mint_uri : null,
-      mint_result : null
+      mint_result : null,
+      mint_tot_supply : 10
     }
   },
   methods:{
@@ -89,7 +92,8 @@ export default {
     connectToContract()
     {
       console.log("click : connect to contract");
-      var contractAddress = "0x60aCf6de68fEd0c2608e9DC96077f51786c13dda";
+      var contractAddress = "0x60aCf6de68fEd0c2608e9DC96077f51786c13dda"; 
+      //  0x60aCf6de68fEd0c2608e9DC96077f51786c13dda
       // 객체들을 동적 할당할 때 new를 사용한다.
       var provider = new ethers.providers.Web3Provider(window.ethereum);
       var signer = provider.getSigner();
@@ -116,19 +120,24 @@ export default {
       console.log("this.mint_toAddr", this.mint_toAddr);
       console.log("this.mint_tokenId", this.mint_tokenId);
       console.log("this.mint_uri", this.mint_uri);
+      console.log("this.myAddress", this.myAddress);
       try{
-        this.mint_result = await this.myContract.mint(this.mint_toAddr, this.mint_tokenId, this.mint_uri)
+        this.mint_result = await this.myContract.mint(this.myAddress, this.mint_tokenId, this.mint_uri)
         if(this.mint_result['hash']){
           alert("minting finished!")
-          this.mint_result = this.mint_result['hash']
+          this.mint_result = "https://goerli.etherscan.io/tx/" + this.mint_result['hash']
+          // this.mint_tot_supply++;
+          // console.log(this.mint_tot_supply);
         }
         else{
           this.mint_result = "transaction failed"
+
         }
       }
       catch{
         alert("minting failed")
         this.mint_result = "transaction failed"
+        // console.log(this.mint_tot_supply);
       }
     }
   }
@@ -137,18 +146,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+@import url(//fonts.googleapis.com/earlyaccess/nanumpenscript.css);
+.fontColor
+{
+  color:#85ddfd
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.fontLargeSize
+{
+  font-size : 20px
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+
+div
+{
+  font-family: 'Nanum Pen Script', cursive;
 }
 </style>
